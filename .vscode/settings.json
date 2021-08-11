@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "axp192.h": "c",
+        "i2c_device.h": "c",
+        "unistd.h": "c",
+        "lwesp_sys.h": "c",
+        "termios.h": "c",
+        "cat.h": "c",
+        "lwesp_sys_port.h": "c",
+        "stdint.h": "c",
+        "pthread.h": "c",
+        "lwesp_opt.h": "c",
+        "stdlib.h": "c",
+        "lwesp_mem.h": "c",
+        "station_manager.h": "c",
+        "math.h": "c"
+    }
+}
