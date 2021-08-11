@@ -115,7 +115,7 @@ lwesp_init(lwesp_evt_fn evt_func, const uint32_t blocking) {
     lwesp_sys_sem_wait(&esp.sem_sync, 0);       /* Lock semaphore */
     printf("lwesp_sys_sem_wait done!\r\n");
     if (!lwesp_sys_thread_create(&esp.thread_produce, "lwesp_produce", lwesp_thread_produce, &esp.sem_sync, LWESP_SYS_THREAD_SS, LWESP_SYS_THREAD_PRIO)) {
-        printf("finished lwesp_sys_thread_create\r\n");
+        printf("fin done!\r\n");
         LWESP_DEBUGF(LWESP_CFG_DBG_INIT | LWESP_DBG_LVL_SEVERE | LWESP_DBG_TYPE_TRACE,
                    "[CORE] Cannot create producing thread!\r\n");
                    printf("D\r\n");
@@ -175,7 +175,6 @@ lwesp_init(lwesp_evt_fn evt_func, const uint32_t blocking) {
     return res;
 
 cleanup:
-    printf("Cleaning up..");
     if (lwesp_sys_mbox_isvalid(&esp.mbox_producer)) {
         lwesp_sys_mbox_delete(&esp.mbox_producer);
         lwesp_sys_mbox_invalid(&esp.mbox_producer);

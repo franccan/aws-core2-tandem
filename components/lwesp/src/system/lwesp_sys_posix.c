@@ -253,6 +253,7 @@ uint8_t
 lwesp_sys_sem_create(lwesp_sys_sem_t* p, uint8_t cnt) {
     int shared_between_processes = 0;
     int result = sem_init(&p->sem, shared_between_processes, cnt);
+    printf("cnt: %i\r\n",cnt);
     p->is_valid = result == 0;
     return p->is_valid;
 }
@@ -312,7 +313,14 @@ lwesp_sys_sem_wait(lwesp_sys_sem_t* p, uint32_t timeout) {
  */
 uint8_t
 lwesp_sys_sem_release(lwesp_sys_sem_t* p) {
-    int ret = sem_close(&p->sem);
+
+    int ret = sem_post(&p->sem);
+    ret = sem_close(&p->sem);
+    
+    int value;
+    sem_getvalue(&p->sem, &value);
+    printf("&lwesp_sys_sem_release: %d\r\n", value );
+
     p->is_valid = 0;
     return ret == 0;
 }
@@ -495,7 +503,9 @@ thread_func_wrapper(void* args)
     thread_wrapper_t* th_wrapper = (thread_wrapper_t*)args; //cast
     lwesp_sys_thread_fn thread_func = th_wrapper->func;   //copy useful informations
     void* thread_args = th_wrapper->args;    //copy useful informations
+
     lwesp_sys_sem_release(&th_wrapper->start_flag);  //notify that we did the copy
+    printf("thread_func_wrapper!!! 2\r\n");
     thread_func(thread_args);
     return NULL;
 }
@@ -542,17 +552,20 @@ lwesp_sys_thread_create(lwesp_sys_thread_t* t, const char* name, lwesp_sys_threa
         pthread_attr_destroy(&attr);
         return 0;
     }
-    printf("lwesp_sys_thread_create 5\r\n");
+
+    int value;
+    sem_getvalue(&wrapper.start_flag.sem, &value);
+    printf("&wrapper.start_flag: %d\r\n", value );
+
     if(pthread_create(t, &attr, thread_func_wrapper, &wrapper) != 0) {
         pthread_attr_destroy(&attr);
         return 0;
     }
-    printf("lwesp_sys_thread_create 6\r\n");
+    //sleep(5);
     //Now we wait that the new thread has correctly started and recovered informations from args, so we can destroy args
-    //lwesp_sys_sem_wait(&wrapper.start_flag, 0);
-    printf("lwesp_sys_thread_create 7\r\n");
+    lwesp_sys_sem_wait(&wrapper.start_flag, 0);
     lwesp_sys_sem_release(&wrapper.start_flag);
-    printf("lwesp_sys_thread_create 8\r\n");
+    
     pthread_attr_destroy(&attr);
     //pthread_setname_np(*t, name);
     return 1;
